@@ -1,82 +1,64 @@
 package com.springdemo.fooddeliveryapplication.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
-import java.time.LocalDate;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDateTime;
 
-@Entity
-public class WeatherData {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+@XmlRootElement(name = "station")
 
-    private String stationName;
-    private String wmoCode;
-    private double airTemperature;
-    private double windSpeed;
-    private String weatherPhenomenon;
-    private LocalDateTime timestamp;
+public class WeatherData {
+    //private long id;
+
+    private String name;
+    private String wmocode;
+    private double airtemperature;
+    private double windspeed;
+    private String phenomenon;
 
     //Getters and setters
 
-
-    public long getId() {
-        return id;
+    @XmlElement(name = "name")
+    public String getName() {
+        return name;
     }
 
-    public String getStationName() {
-        return stationName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getWmoCode() {
-        return wmoCode;
+    @XmlElement(name = "wmocode")
+    public String getWmocode() {
+        return wmocode;
     }
 
-    public double getAirTemperature() {
-        return airTemperature;
+    public void setWmocode(String wmocode) {
+        this.wmocode = wmocode;
     }
 
-    public double getWindSpeed() {
-        return windSpeed;
+    @XmlElement(name = "airtemperature")
+    public double getAirtemperature() {
+        return airtemperature;
     }
 
-    public String getWeatherPhenomenon() {
-        return weatherPhenomenon;
+    public void setAirtemperature(double airtemperature) {
+        this.airtemperature = airtemperature;
     }
 
-    public LocalDateTime getTimestamp() {
-        return timestamp;
+    @XmlElement(name = "windspeed")
+    public double getWindspeed() {
+        return windspeed;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setWindspeed(double windspeed) {
+        this.windspeed = windspeed;
     }
 
-    public void setStationName(String stationName) {
-        this.stationName = stationName;
+    @XmlElement(name = "phenomenon")
+    public String getPhenomenon() {
+        return phenomenon;
     }
 
-    public void setWmoCode(String wmoCode) {
-        this.wmoCode = wmoCode;
-    }
-
-    public void setAirTemperature(double airTemperature) {
-        this.airTemperature = airTemperature;
-    }
-
-    public void setWindSpeed(double windSpeed) {
-        this.windSpeed = windSpeed;
-    }
-
-    public void setWeatherPhenomenon(String weatherPhenomenon) {
-        this.weatherPhenomenon = weatherPhenomenon;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
+    public void setPhenomenon(String phenomenon) {
+        this.phenomenon = phenomenon;
     }
 }
