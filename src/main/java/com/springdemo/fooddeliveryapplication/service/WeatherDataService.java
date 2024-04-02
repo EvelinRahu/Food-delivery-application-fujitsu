@@ -1,0 +1,78 @@
+package com.springdemo.fooddeliveryapplication.service;
+
+import com.springdemo.fooddeliveryapplication.model.Observations;
+import com.springdemo.fooddeliveryapplication.model.Station;
+import com.springdemo.fooddeliveryapplication.model.WeatherData;
+import com.springdemo.fooddeliveryapplication.repository.WeatherDataRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.StringReader;
+import java.util.Date;
+
+
+@Service
+public class WeatherDataService {
+    @Autowired
+    private WeatherDataRepository weatherDataRepository;
+
+    @Value("${weather.stations.tallinn-harku}")
+    private String tallinnHarkuStation;
+
+    @Value("${weather.stations.tartu-tõravere}")
+    private String tartuToravereStation;
+
+    @Value("${weather.stations.pärnu}")
+    private String parnuStation;
+
+    @Transactional
+    public void fetchAndSaveWeatherDataFromURL(String url) {
+        String xmlData = fetchDataFromURL(url);
+        Observations observations = parseXMLData(xmlData);
+        saveWeatherData(observations);
+    }
+
+    private String fetchDataFromURL(String url) {
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.getForObject(url, String.class);
+    }
+
+    private Observations parseXMLData(String xmlData) {
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(Observations.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            return (Observations) unmarshaller.unmarshal(new StringReader(xmlData));
+
+        } catch (JAXBException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Transactional
+    protected void saveWeatherData(Observations observations) {
+        Station station = observations.getStation();
+        String stationName = station.getName();
+
+        // Check if weather data for the station already exists in the database
+        WeatherData existingWeatherData = weatherDataRepository.findByStationName(stationName);
+        WeatherData weatherData = new WeatherData();
+
+        // If weather data for the station doesn't exist, proceed to save it
+        if (existingWeatherData == null) {
+            weatherData.setStationName(station.getName());
+            weatherData.setWmoCode(station.getWmocode());
+            weatherData.setAirTemperature(station.getAirtemperature());
+            weatherData.setWindSpeed(station.getWindspeed());
+            weatherData.setWeatherPhenomenon(station.getPhenomenon());
+            weatherData.setTimestamp(new Date(observations.getTimestamp() * 1000));
+            weatherDataRepository.save(weatherData);
+        }
+    }
+}
